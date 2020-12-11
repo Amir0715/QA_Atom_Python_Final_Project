@@ -1,0 +1,38 @@
+- scm:
+    name: qa-python-scm
+
+    scm:
+      - git:
+          url: git@github.com:snicks92/technoatom-qa-python.git
+          credentials-id: fec0c07f-edca-47e6-94a2-339e6df5443e
+          basedir: src/technoatom-qa-python
+          branches:
+            - lection10
+
+
+- job:
+    name: test-project-v2
+    description: "JJB Project\n"
+    project-type: freestyle
+
+    scm:
+      - qa-python-scm
+
+    wrappers:
+      - timestamps
+      - workspace-cleanup
+
+    triggers:
+      - pollscm:
+          cron: '* * * * *'
+
+    builders:
+      - shell: |
+          mkdir -p $WORKSPACE/allure-results
+          cd "src/technoatom-qa-python/technoatom-2020-2/lection10/code/tests/"
+          pytest -s -l -v --alluredir=$WORKSPACE/allure-results ./
+    publishers:
+      - allure:
+          results-path:
+            - path: allure-results
+          report-build-policy: ALWAYS
